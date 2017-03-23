@@ -245,7 +245,6 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         {
             if(edge_cost(i, x.back().second) < actual_cost)
             {
-
                 //4B) find yi that satisfies 4c 4d 4e else go to step5
                 //4C) xi cannot be a link previously joined and yi not a link previously broken
                 pair<int, int> yi = make_pair(xi.second, i);
