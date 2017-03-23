@@ -150,6 +150,24 @@ bool is_a_tour(VP(int)& best_solution)
     return false;
 }
 
+VP(int) create_changes(vector<int>& t, VP(int) best_solution)
+{
+    for(int i = 0; i < t.size(); ++i)
+    {
+        if(i == t.size()-1){
+            best_solution[t[i]].first = t[i-1];
+            best_solution[t[i]].second = t[0];
+        }else if(i == 0){
+            best_solution[t[i]].first = t[t.size()-1];
+            best_solution[t[i]].second = t[i+1];
+        }else{
+            best_solution[t[i]].first = t[i-1];
+            best_solution[t[i]].second = t[i+1];
+        }
+    }
+    return best_solution;
+}
+
 void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 {
     double G = 0; //best improvement made so far.
@@ -164,7 +182,8 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         int taux = best_solution[t3].first;
 
         //4A) check if we join t1 with the last tX(taux) the result is a tour
- //       is_a_tour();
+        VP(int)& aux_solution = create_changes(t, best_solution);
+        is_a_tour(aux_solution);
 
         //4B) find yi that satisfies 4c 4d 4e else go to step5
   //      find_next_y();
