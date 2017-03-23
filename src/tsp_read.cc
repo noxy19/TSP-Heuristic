@@ -257,6 +257,17 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 //4D) Check the gain
 
                 //4E) The yi chosen must permit the breaking of xi+1
+                int tnext1 = best_solution[i].first;
+                int tnext2 = best_solution[i].second;
+
+                pair<int, int> xn1 = make_pair(i, tnext1);
+                pair<int, int> xn2 = make_pair(i, tnext2);
+                VP(int) aux(0);
+
+                if(!check_links(xn1, yi, aux, yi) and !check_links(xn2, yi, aux, yi))
+                {
+                    continue;
+                }
 
                 //4F) Check if the value is better than the previos y
 
