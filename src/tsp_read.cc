@@ -125,7 +125,7 @@ int search_improvement(int city1, int city2, MATRIX(double)& TSP)
 
 bool is_a_tour(VP(int)& best_solution)
 {
-    vector<bool> visit(TSP.size());
+    vector<bool> visit(best_solution.size());
     int city1 = 0;
     int city2 = best_solution[city1].first == city1 ? best_solution[city1].second : best_solution[city1].first;
     visit[city1] = visit[city2] = true;
@@ -134,7 +134,7 @@ bool is_a_tour(VP(int)& best_solution)
     while(1)
     {
         city1 = city2;
-        city2 = best_solution[city1].first == city ? best_solution[city1].second : best_solution[city1].first;
+        city2 = best_solution[city1].first == city1 ? best_solution[city1].second : best_solution[city1].first;
 
         //if we arrive to the first city we have to check if we've visited all the cities
         if(city2 == 0)
@@ -210,7 +210,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
     //3) search y1
     int t3 = search_improvement(t[0], t[1], TSP);
-    if(t3 < 1) return best_solution;
+    if(t3 < 1) return;
     t.push_back(t3);
     y.push_back(make_pair(t[1], t[2]));
 
@@ -228,7 +228,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         int ti = best_solution[t.back()].first;
         t.push_back(ti);
-        VP(int)& aux_solution = create_changes(t, best_solution);
+        VP(int) aux_solution = create_changes(t, best_solution);
         if(!is_a_tour(aux_solution)){
             t[t.size()-1] = best_solution[t.back()].second;
             aux_solution = create_changes(t, best_solution);
@@ -264,14 +264,14 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 pair<int, int> xn2 = make_pair(i, tnext2);
                 VP(int) aux(0);
 
-                if(!check_links(xn1, yi, aux, yi) and !check_links(xn2, yi, aux, yi))
+                if(!check_links(xn1, yi, aux, y) and !check_links(xn2, yi, aux, y))
                 {
                     continue;
                 }
 
                 //4F) Check if the value is better than the previos y
 
-                int t_size() = t.size();
+                int t_size = t.size();
                 y.push_back( make_pair(t[t_size-2], t[t_size-1]) );
                 break;
             }
@@ -291,6 +291,9 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
     //6E) Select a new t1
 
     //7) We terminate when we have tried all t1 without profit.
+
+
+    best_solution = create_changes(t, best_solution);
 }
 
 int main()
@@ -326,8 +329,10 @@ int main()
         }
     }
 
-//    heuristic_lin_kernighan(best_solution, TSP);
+    cout << "TRAVEL COST BEFORE LIN KERNIGHAN = " << travel_cost(best_solution, TSP);
 
-    cout << "TRAVEL COST = " << travel_cost(best_solution, TSP);
+    heuristic_lin_kernighan(best_solution, TSP);
+
+    cout << "TRAVEL COST AFTER = " << travel_cost(best_solution, TSP);
     cout << endl;
 }
