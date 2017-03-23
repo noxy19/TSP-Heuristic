@@ -17,7 +17,7 @@ unsigned int split(const string &txt, vector<string> &strs, char ch)
     strs.clear();
 
     // Decompose statement
-    while( pos < size ) 
+    while( pos < size )
     {
         strs.push_back(txt.substr(initialPos, pos - initialPos + 1));
         initialPos = pos + 1;
@@ -105,19 +105,19 @@ double travel_cost(VP(int)& best_solution, MATRIX(double)& TSP)
             city2 = best_solution[city1].second;
         else city2 = best_solution[city1].first;
         cityaux = city1;
-        
+
     }
     return total;
 }
 
 int search_improvement(int city1, int city2, MATRIX(double)& TSP)
 {
-    int actual_cost = city1 < city2 ? TSP[city1][city2] : TSP[city2][city1]; 
+    int actual_cost = city1 < city2 ? TSP[city1][city2] : TSP[city2][city1];
     for(int i = 0; i < TSP.size(); ++i)
     {
-        if(city1 < i and TSP[city1][i] < actual_cost or TSP[i][city1] < actual_cost) 
+        if(city1 < i and TSP[city1][i] < actual_cost or TSP[i][city1] < actual_cost)
             return i;
-    } 
+    }
     return -1;
 }
 
@@ -143,7 +143,7 @@ bool is_a_tour(VP(int)& best_solution)
         }
 
         //check if it's the first time in this city
-        if(visit[city2]) return false; 
+        if(visit[city2]) return false;
 
         visit[city2] = true;
     }
@@ -161,7 +161,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
     if(t3 >= 0)
     {
         t.push_back(t3);
-        int taux = best_solution[t3].first;        
+        int taux = best_solution[t3].first;
 
         //4A) check if we join t1 with the last tX(taux) the result is a tour
  //       is_a_tour();
@@ -204,7 +204,7 @@ int main()
     VP(double) cities(N);
 
     read(myfile, cities);
- 
+
     myfile.close();
 
     generateMatrix(cities, TSP);
@@ -214,14 +214,14 @@ int main()
     for(int i = 0; i < N-1; ++i)
     {
         if(i == 0){
-            best_solution[i].first = N-1;    
-            best_solution[i].second = i+1;    
+            best_solution[i].first = N-1;
+            best_solution[i].second = i+1;
         }else if(i == N - 1){
-            best_solution[i].first = i-1;    
+            best_solution[i].first = i-1;
             best_solution[i].second = 0;
         }else{
-            best_solution[i].first = i-1;    
-            best_solution[i].second = i+1;    
+            best_solution[i].first = i-1;
+            best_solution[i].second = i+1;
         }
     }
 
