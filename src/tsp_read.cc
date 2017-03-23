@@ -299,7 +299,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 int main()
 {
     string line;
-    ifstream myfile ("../data/ar9152.tsp");
+    ifstream myfile ("../data/proba1.tsp");
 
     getline(myfile, line);
 
@@ -314,8 +314,8 @@ int main()
     generateMatrix(cities, TSP);
 
     //generate random solution
-    VP(int) best_solution(N-1);
-    for(int i = 0; i < N-1; ++i)
+    VP(int) best_solution(N);
+    for(int i = 0; i < N; ++i)
     {
         if(i == 0){
             best_solution[i].first = N-1;
@@ -330,6 +330,7 @@ int main()
     }
 
     cout << "TRAVEL COST BEFORE LIN KERNIGHAN = " << travel_cost(best_solution, TSP);
+    cout << endl;
 
     heuristic_lin_kernighan(best_solution, TSP);
 
