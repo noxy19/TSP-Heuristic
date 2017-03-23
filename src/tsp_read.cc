@@ -170,6 +170,33 @@ VP(int) create_changes(vector<int>& t, VP(int) best_solution)
     return best_solution;
 }
 
+bool equal_pair(pair<int,int> p1, pair<int,int> p2)
+{
+    if(p1.first == p2.first and p1.second == p2.second or
+            p1.second == p2.first and p1.first == p2.second)
+        return true;
+    return false;
+}
+
+bool check_links(pair<int,int> xi, pair<int,int> yi, VP(int) x, VP(int) y)
+{
+    //xi not in y
+    //yi not in x
+
+    for(int i = 0; i < x.size(); i++)
+    {
+        if(equal_pair(yi, x[i]))
+            return false;
+    }
+
+    for(int i = 0; i < y.size(); i++)
+    {
+        if(equal_pair(xi, y[i]))
+            return false;
+    }
+    return true;
+}
+
 void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 {
     double G = 0; //best improvement made so far.
@@ -198,6 +225,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         //4A) check if we join t1 with the last tX(taux) the result is a tour
         //search for the good ti (we have 2 options first,second node from ti-1)
+
         int ti = best_solution[t.back()].first;
         t.push_back(ti);
         VP(int)& aux_solution = create_changes(t, best_solution);
@@ -206,20 +234,26 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             aux_solution = create_changes(t, best_solution);
             if(!is_a_tour(aux_solution)){
                 t.pop_back();
-                continue;
+                break;
             }
         }
+        //edge xi
+        pair<int, int> xi = make_pair(t[t.size()-1], t.back());
 
+        //find yi start point is the endpoint of xi
         for(int i = 0; i < TSP.size(); ++i)
         {
             if(edge_cost(i, x.back().second) < actual_cost)
             {
-                t.push_back(i);
-                //int taux = best_solution[t3].first;
-
 
                 //4B) find yi that satisfies 4c 4d 4e else go to step5
                 //4C) xi cannot be a link previously joined and yi not a link previously broken
+                pair<int, int> yi = make_pair(xi.second, i);
+
+                if(!check_links(xi, yi, x, y))
+                {
+                    continue;
+                }
 
                 //4D) Check the gain
 
