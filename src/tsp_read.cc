@@ -203,6 +203,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
     vector<int> t;
     VP(int) x, y;
 
+
     //inicialitzation
     t.push_back(0);
     t.push_back(best_solution[t[0]].first);
