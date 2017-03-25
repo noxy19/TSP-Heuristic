@@ -162,6 +162,13 @@ bool is_a_tour(VP(int)& best_solution)
 VP(int) create_changes(vector<int>& t, VP(int) best_solution)
 {
     //t1 -/- t2,  t2 - t3, t3 -/- t4, t4 - t5, etc
+
+    cout << "create changes t = " << endl;
+    for(int i = 0; i < t.size(); ++i){
+        cout << " " << t[i] << " , " ;
+    }
+    cout << endl;
+
     for(int i = 0; i < t.size(); ++i)
     {
         int actual = t[i];
@@ -213,16 +220,30 @@ bool check_links(pair<int,int> xi, pair<int,int> yi, VP(int) x, VP(int) y)
     return true;
 }
 
+void print_vp(VP(int) vp)
+{
+    for(int i = 0; i < vp.size(); ++i)
+    {
+        cout << i << " = [" << vp[i].first << " , " << vp[i].second << "]";
+        cout << endl;
+    }
+    cout << endl << endl;
+}
+
 void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 {
     double G = 0; //best improvement made so far.
-    vector<int> t;
-    VP(int) x, y;
 
     for(int i = 0; i < best_solution.size(); ++i)
     {
+        cout << "***************************" <<endl;
+        cout << "ROUND = " << i << endl;
+
+        vector<int> t;
+        VP(int) x, y;
+
         //inicialitzation
-        t.push_back(0);
+        t.push_back(i);
         t.push_back(best_solution[t[0]].first);
         x.push_back(make_pair(t[0], t[1]));
 
@@ -249,6 +270,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 aux_solution = create_changes(t, best_solution);
                 if(!is_a_tour(aux_solution)){
                     t.pop_back();
+                    cout <<"NO X" << endl;
                     break;
                 }
             }
@@ -272,20 +294,20 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                     //4D) Check the gain
 
                     //4E) The yi chosen must permit the breaking of xi+1
-                    int tnext1 = best_solution[j].first;
-                    int tnext2 = best_solution[j].second;
 
-                    pair<int, int> xn1 = make_pair(j, tnext1);
-                    pair<int, int> xn2 = make_pair(j, tnext2);
-                    VP(int) aux(0);
+                    //int tnext1 = best_solution[j].first;
+                    //int tnext2 = best_solution[j].second;
 
-                    if(!check_links(xn1, yi, aux, y) and !check_links(xn2, yi, aux, y))
-                    {
-                        continue;
-                    }
+                    //pair<int, int> xn1 = make_pair(j, tnext1);
+                    //pair<int, int> xn2 = make_pair(j, tnext2);
+                    //VP(int) aux(0);
+
+                    //if(!check_links(xn1, yi, aux, y) and !check_links(xn2, yi, aux, y))
+                    //{
+                        //continue;
+                    //}
 
                     //4F) Check if the value is better than the previos y
-                    cout << i <<" OK" << endl;
 
                     int t_size = t.size();
                     t.push_back(j);
@@ -296,7 +318,11 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             }
 
             //5) Keep doing this until no improvement found
-            if(!found) break;
+            if(!found){
+                cout << i <<"NOT FOUND" << endl;
+                t.pop_back();
+                break;
+            }
         }
 
 
@@ -311,7 +337,12 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         //7) We terminate when we have tried all t1 without profit.
 
         VP(int) auxVP= create_changes(t, best_solution);
-        if(is_a_tour(auxVP)) best_solution = auxVP;
+        cout << "AUX VP = " << endl;
+        print_vp(auxVP);
+        if(is_a_tour(auxVP)){
+            best_solution = auxVP;
+            print_vp(best_solution);
+        }
     }
 
     //best_solution = create_changes(t, best_solution);
