@@ -159,40 +159,6 @@ bool is_a_tour(VP(int)& best_solution)
     return false;
 }
 
-VP(int) create_changes(vector<int>& t, VP(int) best_solution)
-{
-    //t1 -/- t2,  t2 - t3, t3 -/- t4, t4 - t5, etc
-
-    cout << "create changes t = " << endl;
-    for(int i = 0; i < t.size(); ++i){
-        cout << " " << t[i] << " , " ;
-    }
-    cout << endl;
-
-    for(int i = 0; i < t.size(); ++i)
-    {
-        int actual = t[i];
-        if(i == t.size()-1){
-            if(best_solution[actual].first == t[i-1])
-                best_solution[actual].first = t[0];
-            else best_solution[actual].second = t[0];
-        }else if(i == 0){
-            if(best_solution[actual].first == t[1])
-                best_solution[actual].first = t.back();
-            else best_solution[actual].second = t.back();
-        }else if(i%2 == 0){
-            if(best_solution[actual].first == t[i+1])
-                best_solution[actual].first = t[i-1];
-            else best_solution[actual].second = t[i-1];
-        }else{
-            if(best_solution[actual].first == t[i-1])
-                best_solution[actual].first = t[i+1];
-            else best_solution[actual].second = t[i+1];
-        }
-    }
-    return best_solution;
-}
-
 bool equal_pair(pair<int,int> p1, pair<int,int> p2)
 {
     if(p1.first == p2.first and p1.second == p2.second or
@@ -228,6 +194,41 @@ void print_vp(VP(int) vp)
         cout << endl;
     }
     cout << endl << endl;
+}
+
+VP(int) create_changes(vector<int>& t, VP(int) best_solution)
+{
+    //t1 -/- t2,  t2 - t3, t3 -/- t4, t4 - t5, etc
+
+    cout << "create changes t = " << endl;
+    for(int i = 0; i < t.size(); ++i){
+        cout << " " << t[i] << " , " ;
+    }
+    cout << endl;
+
+    for(int i = 0; i < t.size(); ++i)
+    {
+        int actual = t[i];
+        if(i == t.size()-1){
+            if(best_solution[actual].first == t[i-1])
+                best_solution[actual].first = t[0];
+            else best_solution[actual].second = t[0];
+        }else if(i == 0){
+            if(best_solution[actual].first == t[1])
+                best_solution[actual].first = t.back();
+            else best_solution[actual].second = t.back();
+        }else if(i%2 == 0){
+            if(best_solution[actual].first == t[i+1])
+                best_solution[actual].first = t[i-1];
+            else best_solution[actual].second = t[i-1];
+        }else{
+            if(best_solution[actual].first == t[i-1])
+                best_solution[actual].first = t[i+1];
+            else best_solution[actual].second = t[i+1];
+        }
+    }
+    print_vp(best_solution);
+    return best_solution;
 }
 
 void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
@@ -266,7 +267,9 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             t.push_back(ti);
             VP(int) aux_solution = create_changes(t, best_solution);
             if(!is_a_tour(aux_solution)){
-                t[t.size()-1] = best_solution[t.back()].second;
+                t.pop_back();
+                ti = best_solution[t.size()-2].second;
+                t.push_back(ti);
                 aux_solution = create_changes(t, best_solution);
                 if(!is_a_tour(aux_solution)){
                     t.pop_back();
@@ -274,6 +277,10 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                     break;
                 }
             }
+            cout << endl;
+            cout << "WE HAVE AND IMPROVEMENT" << endl;
+            cout << endl;
+
             //edge xi
             pair<int, int> xi = make_pair(t[t.size()-1], t.back());
 
@@ -320,6 +327,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             //5) Keep doing this until no improvement found
             if(!found){
                 cout << i <<"NOT FOUND" << endl;
+                cout << i <<"NOT FOUND" << endl;
                 t.pop_back();
                 break;
             }
@@ -343,6 +351,11 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             best_solution = auxVP;
             print_vp(best_solution);
         }
+    }
+    if(is_a_tour(best_solution)){
+        cout << endl;
+        cout << "LAST SOLUTION IS A TOUR" << endl;
+        cout << endl;
     }
 
     //best_solution = create_changes(t, best_solution);
