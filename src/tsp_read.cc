@@ -112,12 +112,13 @@ double travel_cost(VP(int)& best_solution, MATRIX(double)& TSP)
     return total;
 }
 
-int search_improvement(int city1, int city2, MATRIX(double)& TSP)
+int search_improvement(int city1, int city2, MATRIX(double)& TSP, VP(int) best_solution)
 {
     int actual_cost = city1 < city2 ? TSP[city1][city2] : TSP[city2][city1];
     for(int i = 0; i < TSP.size(); ++i)
     {
-        if(i == city1) continue;
+        if(i == city1 or i == city2) continue;
+        if
         if(city1 < i and TSP[city1][i] < actual_cost or TSP[i][city1] < actual_cost)
             return i;
     }
@@ -231,21 +232,34 @@ VP(int) create_changes(vector<int>& t, VP(int) best_solution)
     return best_solution;
 }
 
+bool already_exist(int ti, vector<int> t)
+{
+    for(int i = 0; i < t.size()-1; ++i)
+    {
+        if(ti == t[i]) return true;
+    }
+    return false;
+}
+
 void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 {
     double G = 0; //best improvement made so far.
+    cout << "GRAF INICIAL :" <<endl;
+    print_vp(best_solution);
+    cout << endl;
 
     for(int i = 0; i < best_solution.size(); ++i)
     {
         cout << "***************************" <<endl;
         cout << "ROUND = " << i << endl;
+        cout << "***************************" <<endl;
 
         vector<int> t;
         VP(int) x, y;
 
         //inicialitzation
         t.push_back(i);
-        t.push_back(best_solution[t[0]].first);
+        t.push_back(best_solution[t[0]].second);
         x.push_back(make_pair(t[0], t[1]));
 
         //3) search y1
@@ -266,14 +280,17 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             int ti = best_solution[t.back()].first;
             t.push_back(ti);
             VP(int) aux_solution = create_changes(t, best_solution);
-            if(!is_a_tour(aux_solution)){
+            if(already_exist(ti, t) or !is_a_tour(aux_solution)){
                 t.pop_back();
-                ti = best_solution[t.size()-2].second;
+                ti = best_solution[t.back()].second;
                 t.push_back(ti);
-                aux_solution = create_changes(t, best_solution);
-                if(!is_a_tour(aux_solution)){
+                VP(int) aux_solution = create_changes(t, best_solution);
+
+                //if not a tour break
+                if(already_exist(ti, t) or !is_a_tour(aux_solution)){
                     t.pop_back();
                     cout <<"NO X" << endl;
+                    cout << endl;
                     break;
                 }
             }
