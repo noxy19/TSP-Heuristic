@@ -249,7 +249,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         //3) search y1
         int t3 = search_improvement(t[0], t[1], TSP);
-        if(t3 < 1) return;
+        if(t3 < 1) continue;
         t.push_back(t3);
         y.push_back(make_pair(t[1], t[2]));
 
