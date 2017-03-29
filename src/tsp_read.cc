@@ -134,7 +134,6 @@ bool is_a_tour(VP(int)& best_solution)
     int city2 = best_solution[city1].first;
     visit[city1] = visit[city2] = true;
 
-    cout << "CITY 2 = " << city2 << endl;
 
     //keep traveling until we found a repited vertex
     while(1)
@@ -142,10 +141,6 @@ bool is_a_tour(VP(int)& best_solution)
         int city_aux = city1;
         city1 = city2;
         city2 = best_solution[city1].first == city_aux ? best_solution[city1].second : best_solution[city1].first;
-
-        cout << "CITY 1 = " << city1 << endl;
-        cout << "CITY 2 = " << city2 << endl;
-        cout << endl;
 
         //if we arrive to the first city we have to check if we've visited all the cities
         if(city2 == 0)
@@ -241,7 +236,7 @@ VP(int) create_changes(vector<int>& t, VP(int) best_solution)
             else best_solution[actual].second = t[i+1];
         }
     }
-    print_vp(best_solution);
+    //print_vp(best_solution);
     return best_solution;
 }
 
@@ -257,6 +252,7 @@ bool already_exist(int ti, vector<int> t)
 void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 {
     double G = 0; //best improvement made so far.
+    double actual_cost = travel_cost(best_solution, TSP);
     cout << "GRAF INICIAL :" <<endl;
     print_vp(best_solution);
     cout << endl;
@@ -307,9 +303,6 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                     break;
                 }
             }
-            cout << endl;
-            cout << "WE HAVE AND IMPROVEMENT" << endl;
-            cout << endl;
 
             //edge xi
             pair<int, int> xi = make_pair(t[t.size()-1], t.back());
@@ -357,7 +350,6 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             //5) Keep doing this until no improvement found
             if(!found){
                 cout << i <<"NOT FOUND" << endl;
-                cout << i <<"NOT FOUND" << endl;
                 t.pop_back();
                 break;
             }
@@ -376,9 +368,11 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         VP(int) auxVP= create_changes(t, best_solution);
         cout << "AUX VP = " << endl;
-        print_vp(auxVP);
-        if(is_a_tour(auxVP)){
+        //print_vp(auxVP);
+        int aux_cost;
+        if(is_a_tour(auxVP) and (aux_cost = travel_cost(auxVP, TSP)) < actual_cost){
             best_solution = auxVP;
+            actual_cost = aux_cost;
             print_vp(best_solution);
         }
     }
@@ -394,7 +388,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 int main()
 {
     string line;
-    ifstream myfile ("../data/proba1.tsp");
+    ifstream myfile ("../data/proba2.tsp");
 
     getline(myfile, line);
 
