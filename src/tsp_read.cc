@@ -209,11 +209,11 @@ VP(int) create_changes(vector<int>& t, VP(int) best_solution)
 {
     //t1 -/- t2,  t2 - t3, t3 -/- t4, t4 - t5, etc
 
-    cout << "create changes t = " << endl;
-    for(int i = 0; i < t.size(); ++i){
-        cout << " " << t[i] << " , " ;
-    }
-    cout << endl;
+    //cout << "create changes t = " << endl;
+    //for(int i = 0; i < t.size(); ++i){
+        //cout << " " << t[i] << " , " ;
+    //}
+    //cout << endl;
 
     for(int i = 0; i < t.size(); ++i)
     {
@@ -236,7 +236,6 @@ VP(int) create_changes(vector<int>& t, VP(int) best_solution)
             else best_solution[actual].second = t[i+1];
         }
     }
-    //print_vp(best_solution);
     return best_solution;
 }
 
@@ -255,15 +254,14 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
     double actual_cost = travel_cost(best_solution, TSP);
 
 
-    cout << "GRAF INICIAL :" <<endl;
-    print_vp(best_solution);
-    cout << endl;
+    //cout << "GRAF INICIAL :" <<endl;
+    //print_vp(best_solution);
 
     for(int i = 0; i < best_solution.size(); ++i)
     {
-        cout << "***************************" <<endl;
-        cout << "ROUND = " << i << endl;
-        cout << "***************************" <<endl;
+        //cout << "***************************" <<endl;
+        //cout << "ROUND = " << i << endl;
+        //cout << "***************************" <<endl;
 
         vector<int> t;
         VP(int) x, y;
@@ -305,21 +303,21 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 //if not a tour break
                 if(already_exist(ti, t) or !is_a_tour(aux_solution)){
                     t.pop_back();
-                    cout <<"NO X" << endl;
-                    cout << endl;
                     break;
                 }
             }
 
             aux_cost = travel_cost(aux_solution, TSP);
-            cout << endl;
-            cout << "aux cost = " << aux_cost << endl;
-            cout << "actual cost = " << actual_cost << endl;
-            cout << endl;
+
+            //cout << endl;
+            //cout << "aux cost = " << aux_cost << endl;
+            //cout << "actual cost = " << actual_cost << endl;
+            //cout << endl;
+
             if(aux_cost < actual_cost){
                 best_aux_solution = aux_solution;
                 actual_cost = aux_cost;
-                print_vp(best_solution);
+                //print_vp(best_solution);
             }
 
             //edge xi
