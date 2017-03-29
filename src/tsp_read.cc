@@ -117,8 +117,10 @@ int search_improvement(int city1, int city2, MATRIX(double)& TSP, VP(int) best_s
     int actual_cost = city1 < city2 ? TSP[city1][city2] : TSP[city2][city1];
     for(int i = 0; i < TSP.size(); ++i)
     {
+        //not the same city
         if(i == city1 or i == city2) continue;
-        if
+        //ignore if it's already a link
+        if(i == best_solution[city2].first or i == best_solution[city2].second) continue;
         if(city1 < i and TSP[city1][i] < actual_cost or TSP[i][city1] < actual_cost)
             return i;
     }
@@ -129,14 +131,21 @@ bool is_a_tour(VP(int)& best_solution)
 {
     vector<bool> visit(best_solution.size());
     int city1 = 0;
-    int city2 = best_solution[city1].first == city1 ? best_solution[city1].second : best_solution[city1].first;
+    int city2 = best_solution[city1].first;
     visit[city1] = visit[city2] = true;
+
+    cout << "CITY 2 = " << city2 << endl;
 
     //keep traveling until we found a repited vertex
     while(1)
     {
+        int city_aux = city1;
         city1 = city2;
-        city2 = best_solution[city1].first == city1 ? best_solution[city1].second : best_solution[city1].first;
+        city2 = best_solution[city1].first == city_aux ? best_solution[city1].second : best_solution[city1].first;
+
+        cout << "CITY 1 = " << city1 << endl;
+        cout << "CITY 2 = " << city2 << endl;
+        cout << endl;
 
         //if we arrive to the first city we have to check if we've visited all the cities
         if(city2 == 0)
@@ -153,7 +162,11 @@ bool is_a_tour(VP(int)& best_solution)
         }
 
         //check if it's the first time in this city
-        if(visit[city2]) return false;
+        if(visit[city2]){
+            cout << "REPITED CITY" << endl;
+            cout << endl;
+            return false;
+        }
 
         visit[city2] = true;
     }
@@ -263,7 +276,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         x.push_back(make_pair(t[0], t[1]));
 
         //3) search y1
-        int t3 = search_improvement(t[0], t[1], TSP);
+        int t3 = search_improvement(t[0], t[1], TSP, best_solution);
         if(t3 < 1) continue;
         t.push_back(t3);
         y.push_back(make_pair(t[1], t[2]));
