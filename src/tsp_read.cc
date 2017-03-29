@@ -253,6 +253,8 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 {
     double G = 0; //best improvement made so far.
     double actual_cost = travel_cost(best_solution, TSP);
+
+
     cout << "GRAF INICIAL :" <<endl;
     print_vp(best_solution);
     cout << endl;
@@ -265,10 +267,15 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         vector<int> t;
         VP(int) x, y;
+        VP(int) best_aux_solution = best_solution;
+        VP(int) aux_solution;
+        int aux_cost;
 
         //inicialitzation
         t.push_back(i);
         t.push_back(best_solution[t[0]].second);
+
+        //x1
         x.push_back(make_pair(t[0], t[1]));
 
         //3) search y1
@@ -281,19 +288,19 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         while(1)
         {
 
-            int actual_cost = edge_cost(x.back().first, x.back().second);
+            int cost_edge = edge_cost(x.back().first, x.back().second);
             bool found = false;
             //4A) check if we join t1 with the last tX(taux) the result is a tour
             //search for the good ti (we have 2 options first,second node from ti-1)
 
             int ti = best_solution[t.back()].first;
             t.push_back(ti);
-            VP(int) aux_solution = create_changes(t, best_solution);
+            aux_solution = create_changes(t, best_solution);
             if(already_exist(ti, t) or !is_a_tour(aux_solution)){
                 t.pop_back();
                 ti = best_solution[t.back()].second;
                 t.push_back(ti);
-                VP(int) aux_solution = create_changes(t, best_solution);
+                aux_solution = create_changes(t, best_solution);
 
                 //if not a tour break
                 if(already_exist(ti, t) or !is_a_tour(aux_solution)){
@@ -304,19 +311,30 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 }
             }
 
+            aux_cost = travel_cost(aux_solution, TSP);
+            cout << endl;
+            cout << "aux cost = " << aux_cost << endl;
+            cout << "actual cost = " << actual_cost << endl;
+            cout << endl;
+            if(aux_cost < actual_cost){
+                best_aux_solution = aux_solution;
+                actual_cost = aux_cost;
+                print_vp(best_solution);
+            }
+
             //edge xi
             pair<int, int> xi = make_pair(t[t.size()-1], t.back());
 
             //find yi start point is the endpoint of xi
             for(int j = 0; j < TSP.size(); ++j)
             {
-                if(edge_cost(j, x.back().second) < actual_cost)
+                if(edge_cost(j, x.back().second) < cost_edge)
                 {
                     //4B) find yi that satisfies 4c 4d 4e else go to step5
                     //4C) xi cannot be a link previously joined and yi not a link previously broken
                     pair<int, int> yi = make_pair(xi.second, j);
 
-                    if(!check_links(xi, yi, x, y))
+                    if(!check_links(xi, yi, x, y) or already_exist(j, t))
                     {
                         continue;
                     }
@@ -353,6 +371,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 t.pop_back();
                 break;
             }
+
         }
 
 
@@ -366,16 +385,19 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         //7) We terminate when we have tried all t1 without profit.
 
-        VP(int) auxVP= create_changes(t, best_solution);
-        cout << "AUX VP = " << endl;
-        //print_vp(auxVP);
-        int aux_cost;
-        if(is_a_tour(auxVP) and (aux_cost = travel_cost(auxVP, TSP)) < actual_cost){
-            best_solution = auxVP;
-            actual_cost = aux_cost;
-            print_vp(best_solution);
-        }
+        best_solution = best_aux_solution;
+
+        /*VP(int) auxVP= create_changes(t, best_solution);*/
+        //cout << "AUX VP = " << endl;
+        ////print_vp(auxVP);
+        //int aux_cost;
+        //if(is_a_tour(auxVP) and (aux_cost = travel_cost(auxVP, TSP)) < actual_cost){
+            //best_solution = auxVP;
+            //actual_cost = aux_cost;
+            //print_vp(best_solution);
+        /*}*/
     }
+
     if(is_a_tour(best_solution)){
         cout << endl;
         cout << "LAST SOLUTION IS A TOUR" << endl;
