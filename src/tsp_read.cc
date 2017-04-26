@@ -396,20 +396,26 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         /*}*/
     }
 
-    if(is_a_tour(best_solution)){
-        cout << endl;
-        cout << "LAST SOLUTION IS A TOUR" << endl;
-        cout << endl;
-    }
+    //if(is_a_tour(best_solution)){
+        //cout << endl;
+        //cout << "LAST SOLUTION IS A TOUR" << endl;
+        //cout << endl;
+    //}
 
     //best_solution = create_changes(t, best_solution);
 }
 
-int main()
+int main(int argc, const char* argv[])
 {
-    string line;
-    ifstream myfile ("../data/proba2.tsp");
+    string path_file, file_name;
+    //file_name = "proba2.tsp";
+    //file_name = "../data/proba2.tsp";
+    file_name = string(argv[1]);
+    path_file = "../data/" + file_name;
 
+    ifstream myfile (path_file);
+
+    string line;
     getline(myfile, line);
 
     int N = atoi(line.c_str());
