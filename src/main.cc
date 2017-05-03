@@ -40,12 +40,22 @@ int main(int argc, const char* argv[])
         }
     }
 
-    cout << "TRAVEL COST BEFORE LIN KERNIGHAN = " << travel_cost(best_solution, TSP);
+    int previos_cost = travel_cost(best_solution, TSP);
+    cout << "TRAVEL COST BEFORE LIN KERNIGHAN = " << previos_cost;
     cout << endl;
 
     heuristic_lin_kernighan(best_solution, TSP);
 
     if(!is_a_tour(best_solution)) cout << "WRONG IS NOT A TOUR" <<endl;
-    cout << "TRAVEL COST AFTER = " << travel_cost(best_solution, TSP);
+    int after_cost = travel_cost(best_solution, TSP);
+    cout << "TRAVEL COST AFTER = " << after_cost;
     cout << endl;
+    while(after_cost < previos_cost)
+    {
+        previos_cost = after_cost;
+        heuristic_lin_kernighan(best_solution, TSP);
+        after_cost = travel_cost(best_solution, TSP);
+        cout << "TRAVEL COST AFTER = " << after_cost;
+        cout << endl;
+    }
 }

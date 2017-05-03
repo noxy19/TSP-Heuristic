@@ -289,7 +289,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
             //5) Keep doing this until no improvement found
             if(!found){
-                cout << i <<"NOT FOUND" << endl;
+                //cout << i <<"NOT FOUND" << endl;
                 t.pop_back();
                 break;
             }
