@@ -3,5 +3,5 @@
 echo ""
 ./a.out proba2.tsp
 echo ""
-./a.out proba3.tsp
-echo ""
+#./a.out proba3.tsp
+#echo ""
