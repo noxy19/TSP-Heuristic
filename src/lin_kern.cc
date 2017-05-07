@@ -187,124 +187,136 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         //cout << "ROUND = " << i << endl;
         //cout << "***************************" <<endl;
 
-        vector<int> t;
-        VP(int) x, y;
         VP(int) best_aux_solution = best_solution;
-        VP(int) aux_solution;
-        int aux_cost;
 
-        //inicialitzation
-        t.push_back(i);
-        if(odds == 0){
-            t.push_back(best_solution[t[0]].second);
-            odds = 1;
-        } else {
-            t.push_back(best_solution[t[0]].first);
-            odds = 0;
-            ++i;
-        }
-
-        //x1
-        x.push_back(make_pair(t[0], t[1]));
-
-        //3) search y1
-        int t3 = search_improvement(t[0], t[1], TSP, best_solution);
-        if(t3 < 1) continue;
-        t.push_back(t3);
-        y.push_back(make_pair(t[1], t[2]));
-
-        //4) chose xi and yi
-        while(1)
+        for(int t3 = 0; t3 < best_solution.size(); t3++)
         {
-            int cost_edge = edge_cost(x.back().first, x.back().second);
-            bool found = false;
+            vector<int> t;
+            VP(int) x, y;
+            VP(int) aux_solution;
+            int aux_cost;
 
-            //4A) check if we join t1 with the last tX(taux) the result is a tour
-            //search for the good ti (we have 2 options first,second node from ti-1)
+            //inicialitzation
+            t.push_back(i);
+            if(odds == 0){
+                t.push_back(best_solution[t[0]].second);
+                odds = 1;
+            } else {
+                t.push_back(best_solution[t[0]].first);
+                odds = 0;
+                ++i;
+            }
 
-            int ti = best_solution[t.back()].first;
-            t.push_back(ti);
-            aux_solution = create_changes(t, best_solution);
-            if(already_exist(ti, t) or !is_a_tour(aux_solution)){
-                t.pop_back();
-                ti = best_solution[t.back()].second;
+            //x1
+            x.push_back(make_pair(t[0], t[1]));
+
+            //3) search y1
+            //int t3 = search_improvement(t[0], t[1], TSP, best_solution);
+            //if(t3 < 1) continue;
+                if(t3 == t[1]) continue;
+            t.push_back(t3);
+            y.push_back(make_pair(t[1], t[2]));
+
+            //4) chose xi and yi
+            while(1)
+            {
+                int cost_edge = edge_cost(x.back().first, x.back().second);
+                bool found = false;
+
+                //4A) check if we join t1 with the last tX(taux) the result is a tour
+                //search for the good ti (we have 2 options first,second node from ti-1)
+
+                int ti = best_solution[t.back()].first;
                 t.push_back(ti);
                 aux_solution = create_changes(t, best_solution);
-
-                //if not a tour break
                 if(already_exist(ti, t) or !is_a_tour(aux_solution)){
+                    t.pop_back();
+                    ti = best_solution[t.back()].second;
+                    t.push_back(ti);
+                    aux_solution = create_changes(t, best_solution);
+
+                    //if not a tour break
+                    if(already_exist(ti, t) or !is_a_tour(aux_solution)){
+                        t.pop_back();
+                        break;
+                    }
+                }
+
+                aux_cost = travel_cost(aux_solution, TSP);
+
+                if(aux_cost < actual_cost){
+                    best_aux_solution = aux_solution;
+                    actual_cost = aux_cost;
+                }
+
+                //edge xi
+                pair<int, int> xi = make_pair(t[t.size()-1], t.back());
+
+                //find yi start point is the endpoint of xi
+                for(int j = 0; j < TSP.size(); ++j)
+                {
+                    //4D) Check the gain
+                    if(edge_cost(j, x.back().second) < cost_edge)
+                    {
+                        //4B) find yi that satisfies 4c 4d 4e else go to step5
+                        //4C) xi cannot be a link previously joined and yi not a link previously broken
+                        pair<int, int> yi = make_pair(xi.second, j);
+
+                        if(!check_links(xi, yi, x, y) or already_exist(j, t))
+                        {
+                            continue;
+                        }
+
+
+                        //4E) The yi chosen must permit the breaking of xi+1
+
+                        int t_size = t.size();
+                        t.push_back(j);
+
+                        //to test
+                        ti = best_solution[t.back()].first;
+                        t.push_back(ti);
+                        aux_solution = create_changes(t, best_solution);
+                        if(already_exist(ti, t) or !is_a_tour(aux_solution)){
+                            t.pop_back();
+                            ti = best_solution[t.back()].second;
+                            t.push_back(ti);
+                            aux_solution = create_changes(t, best_solution);
+
+                            //if not a tour break
+                            if(already_exist(ti, t) or !is_a_tour(aux_solution)){
+                                t.pop_back();
+                                t.pop_back();
+                                continue;
+                            }
+                        }
+                        t.pop_back();
+
+
+                        //4F) Check if the value is better than the previos y
+
+                        found = true;
+                        y.push_back( make_pair(t[t_size-2], t[t_size-1]) );
+                        break;
+                    }
+                }
+
+                //5) Keep doing this until no improvement found
+                if(!found){
+                    //cout << i <<"NOT FOUND" << endl;
                     t.pop_back();
                     break;
                 }
+
             }
-
-            aux_cost = travel_cost(aux_solution, TSP);
-
-            if(aux_cost < actual_cost){
-                best_aux_solution = aux_solution;
-                actual_cost = aux_cost;
-            }
-
-            //edge xi
-            pair<int, int> xi = make_pair(t[t.size()-1], t.back());
-
-            //find yi start point is the endpoint of xi
-            for(int j = 0; j < TSP.size(); ++j)
-            {
-                //4D) Check the gain
-                if(edge_cost(j, x.back().second) < cost_edge)
-                {
-                    //4B) find yi that satisfies 4c 4d 4e else go to step5
-                    //4C) xi cannot be a link previously joined and yi not a link previously broken
-                    pair<int, int> yi = make_pair(xi.second, j);
-
-                    if(!check_links(xi, yi, x, y) or already_exist(j, t))
-                    {
-                        continue;
-                    }
-
-
-                    //4E) The yi chosen must permit the breaking of xi+1
-
-                    if(!is_a_tour(aux_solution)){
-                        t.pop_back();
-                        ti = best_solution[t.back()].second;
-                        t.push_back(ti);
-                        aux_solution = create_changes(t, best_solution);
-
-                        //if not a tour break
-                        if(already_exist(ti, t) or !is_a_tour(aux_solution)){
-                            t.pop_back();
-                            break;
-                        }
-                    }
-
-
-                    //4F) Check if the value is better than the previos y
-
-                    int t_size = t.size();
-                    t.push_back(j);
-                    found = true;
-                    y.push_back( make_pair(t[t_size-2], t[t_size-1]) );
-                    break;
-                }
-            }
-
-            //5) Keep doing this until no improvement found
-            if(!found){
-                //cout << i <<"NOT FOUND" << endl;
-                t.pop_back();
-                break;
-            }
-
         }
 
 
         //6) Backtracking:
         //************************************************//
         //6A) Choose y2 can increase length while g1 + g2 > 0.
-        //6B) Try another x2 in 4B
-        //6C) y1 are selected in order to increase length.
+        //6B) Try another x2 in 4B OK
+        //6C) y1 are selected in order to increase length. OK
         //6D) Try another x1 OK
         //6E) Select a new t1 OK
 
@@ -312,15 +324,6 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         best_solution = best_aux_solution;
 
-        /*VP(int) auxVP= create_changes(t, best_solution);*/
-        //cout << "AUX VP = " << endl;
-        ////print_vp(auxVP);
-        //int aux_cost;
-        //if(is_a_tour(auxVP) and (aux_cost = travel_cost(auxVP, TSP)) < actual_cost){
-            //best_solution = auxVP;
-            //actual_cost = aux_cost;
-            //print_vp(best_solution);
-        /*}*/
     }
 
     //if(is_a_tour(best_solution)){
