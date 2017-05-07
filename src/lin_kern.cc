@@ -177,18 +177,13 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
     double G = 0; //best improvement made so far.
     double actual_cost = travel_cost(best_solution, TSP);
 
-
-    //cout << "GRAF INICIAL :" <<endl;
-    //print_vp(best_solution);
-
+    //6E) Select a new t1 OK
     for(int i = 0, odds = 0; i < best_solution.size();)
     {
-        //cout << "***************************" <<endl;
-        //cout << "ROUND = " << i << endl;
-        //cout << "***************************" <<endl;
 
         VP(int) best_aux_solution = best_solution;
 
+        //6C) y1 are selected in order to increase length. OK
         for(int t3 = 0; t3 < best_solution.size(); t3++)
         {
             vector<int> t;
@@ -198,6 +193,8 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
             //inicialitzation
             t.push_back(i);
+
+            //6D) Try another x1 OK
             if(odds == 0){
                 t.push_back(best_solution[t[0]].second);
                 odds = 1;
@@ -213,7 +210,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             //3) search y1
             //int t3 = search_improvement(t[0], t[1], TSP, best_solution);
             //if(t3 < 1) continue;
-                if(t3 == t[1]) continue;
+            if(t3 == t[1]) continue;
             t.push_back(t3);
             y.push_back(make_pair(t[1], t[2]));
 
@@ -256,6 +253,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                 for(int j = 0; j < TSP.size(); ++j)
                 {
                     //4D) Check the gain
+                    //4F) Check if the value is better than the previos y
                     if(edge_cost(j, x.back().second) < cost_edge)
                     {
                         //4B) find yi that satisfies 4c 4d 4e else go to step5
@@ -277,6 +275,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                         ti = best_solution[t.back()].first;
                         t.push_back(ti);
                         aux_solution = create_changes(t, best_solution);
+                        //6B) Try another x2 in 4B OK
                         if(already_exist(ti, t) or !is_a_tour(aux_solution)){
                             t.pop_back();
                             ti = best_solution[t.back()].second;
@@ -291,9 +290,6 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                             }
                         }
                         t.pop_back();
-
-
-                        //4F) Check if the value is better than the previos y
 
                         found = true;
                         y.push_back( make_pair(t[t_size-2], t[t_size-1]) );
@@ -325,10 +321,4 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         best_solution = best_aux_solution;
 
     }
-
-    //if(is_a_tour(best_solution)){
-        //cout << endl;
-        //cout << "LAST SOLUTION IS A TOUR" << endl;
-        //cout << endl;
-    //}
 }
