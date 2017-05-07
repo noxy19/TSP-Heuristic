@@ -181,7 +181,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
     //cout << "GRAF INICIAL :" <<endl;
     //print_vp(best_solution);
 
-    for(int i = 0; i < best_solution.size(); ++i)
+    for(int i = 0, odds = 0; i < best_solution.size();)
     {
         //cout << "***************************" <<endl;
         //cout << "ROUND = " << i << endl;
@@ -195,7 +195,14 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
         //inicialitzation
         t.push_back(i);
-        t.push_back(best_solution[t[0]].second);
+        if(odds == 0){
+            t.push_back(best_solution[t[0]].second);
+            odds = 1;
+        } else {
+            t.push_back(best_solution[t[0]].first);
+            odds = 0;
+            ++i;
+        }
 
         //x1
         x.push_back(make_pair(t[0], t[1]));
@@ -209,9 +216,9 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         //4) chose xi and yi
         while(1)
         {
-
             int cost_edge = edge_cost(x.back().first, x.back().second);
             bool found = false;
+
             //4A) check if we join t1 with the last tX(taux) the result is a tour
             //search for the good ti (we have 2 options first,second node from ti-1)
 
@@ -233,15 +240,9 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
 
             aux_cost = travel_cost(aux_solution, TSP);
 
-            //cout << endl;
-            //cout << "aux cost = " << aux_cost << endl;
-            //cout << "actual cost = " << actual_cost << endl;
-            //cout << endl;
-
             if(aux_cost < actual_cost){
                 best_aux_solution = aux_solution;
                 actual_cost = aux_cost;
-                //print_vp(best_solution);
             }
 
             //edge xi
@@ -250,6 +251,7 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
             //find yi start point is the endpoint of xi
             for(int j = 0; j < TSP.size(); ++j)
             {
+                //4D) Check the gain
                 if(edge_cost(j, x.back().second) < cost_edge)
                 {
                     //4B) find yi that satisfies 4c 4d 4e else go to step5
@@ -261,21 +263,22 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
                         continue;
                     }
 
-                    //4D) Check the gain
 
                     //4E) The yi chosen must permit the breaking of xi+1
 
-                    //int tnext1 = best_solution[j].first;
-                    //int tnext2 = best_solution[j].second;
+                    if(!is_a_tour(aux_solution)){
+                        t.pop_back();
+                        ti = best_solution[t.back()].second;
+                        t.push_back(ti);
+                        aux_solution = create_changes(t, best_solution);
 
-                    //pair<int, int> xn1 = make_pair(j, tnext1);
-                    //pair<int, int> xn2 = make_pair(j, tnext2);
-                    //VP(int) aux(0);
+                        //if not a tour break
+                        if(already_exist(ti, t) or !is_a_tour(aux_solution)){
+                            t.pop_back();
+                            break;
+                        }
+                    }
 
-                    //if(!check_links(xn1, yi, aux, y) and !check_links(xn2, yi, aux, y))
-                    //{
-                        //continue;
-                    //}
 
                     //4F) Check if the value is better than the previos y
 
@@ -302,8 +305,8 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         //6A) Choose y2 can increase length while g1 + g2 > 0.
         //6B) Try another x2 in 4B
         //6C) y1 are selected in order to increase length.
-        //6D) Try another x1
-        //6E) Select a new t1
+        //6D) Try another x1 OK
+        //6E) Select a new t1 OK
 
         //7) We terminate when we have tried all t1 without profit.
 
@@ -325,6 +328,4 @@ void heuristic_lin_kernighan(VP(int)& best_solution, MATRIX(double)& TSP)
         //cout << "LAST SOLUTION IS A TOUR" << endl;
         //cout << endl;
     //}
-
-    //best_solution = create_changes(t, best_solution);
 }
